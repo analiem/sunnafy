@@ -1,0 +1,287 @@
+export type LangCode =
+  | "id"
+  | "en"
+  | "ms"
+  | "fil"
+  | "ja"
+  | "zh"
+  | "ko"
+  | "th"
+  | "es"
+  | "de"
+  | "fr";
+
+export interface Language {
+  code: LangCode;
+  label: string;
+  flag: string;
+  dir: "ltr" | "rtl";
+}
+
+export const LANGUAGES: Language[] = [
+  { code: "id", label: "Indonesia", flag: "🇮🇩", dir: "ltr" },
+  { code: "en", label: "English", flag: "🇬🇧", dir: "ltr" },
+  { code: "ms", label: "Melayu", flag: "🇲🇾", dir: "ltr" },
+  { code: "fil", label: "Filipino", flag: "🇵🇭", dir: "ltr" },
+  { code: "ja", label: "日本語", flag: "🇯🇵", dir: "ltr" },
+  { code: "zh", label: "中文", flag: "🇨🇳", dir: "ltr" },
+  { code: "ko", label: "한국어", flag: "🇰🇷", dir: "ltr" },
+  { code: "th", label: "ภาษาไทย", flag: "🇹🇭", dir: "ltr" },
+  { code: "es", label: "Español", flag: "🇪🇸", dir: "ltr" },
+  { code: "de", label: "Deutsch", flag: "🇩🇪", dir: "ltr" },
+  { code: "fr", label: "Français", flag: "🇫🇷", dir: "ltr" },
+];
+
+export const UI_TEXT: Record<LangCode, {
+  tagline: string;
+  subtitle: string;
+  placeholder: string;
+  searchBtn: string;
+  randomBtn: string;
+  randomTip: string;
+  suggestedTopics: string;
+  loading: string;
+  noResult: string;
+  noResultSub: string;
+  foundLabel: (n: number, q: string) => string;
+  showArabic: string;
+  hideArabic: string;
+  aiLabel: string;
+  lessonLabel: string;
+  shareLabel: string;
+  copied: string;
+  footer: string;
+  topics: string[];
+}> = {
+  id: {
+    tagline: "Sunnah in your pocket",
+    subtitle: "Temukan hadis Nabi ﷺ berdasarkan tema atau kata kunci, lengkap dengan penjelasan AI",
+    placeholder: "Cari hadis... misal: sabar, sholat, rezeki",
+    searchBtn: "Cari",
+    randomBtn: "Acak",
+    randomTip: "Tekan Enter atau klik Cari · 🔀 untuk hadis acak",
+    suggestedTopics: "Coba cari topik:",
+    loading: "Mencari hadis & menyiapkan penjelasan...",
+    noResult: "Tidak ditemukan hadis untuk kata kunci tersebut.",
+    noResultSub: "Coba gunakan kata yang lebih umum.",
+    foundLabel: (n, q) => `${n} hadis ditemukan untuk "${q}"`,
+    showArabic: "Lihat teks Arab",
+    hideArabic: "Sembunyikan teks Arab",
+    aiLabel: "Penjelasan AI",
+    lessonLabel: "Pelajaran",
+    shareLabel: "Bagikan",
+    copied: "Disalin!",
+    footer: "Sumber: fawazahmed0/hadith-api · Penjelasan: AI via OpenRouter · Semoga bermanfaat 🤲",
+    topics: ["sabar", "sholat", "rezeki", "jujur", "ikhlas", "sedekah", "taubat", "doa"],
+  },
+  en: {
+    tagline: "Sunnah in your pocket",
+    subtitle: "Find hadiths of the Prophet ﷺ by theme or keyword, with AI-powered explanations",
+    placeholder: "Search hadith... e.g: patience, prayer, sustenance",
+    searchBtn: "Search",
+    randomBtn: "Random",
+    randomTip: "Press Enter or click Search · 🔀 for a random hadith",
+    suggestedTopics: "Try searching:",
+    loading: "Searching hadiths & preparing explanations...",
+    noResult: "No hadiths found for that keyword.",
+    noResultSub: "Try using a more general word.",
+    foundLabel: (n, q) => `${n} hadiths found for "${q}"`,
+    showArabic: "Show Arabic text",
+    hideArabic: "Hide Arabic text",
+    aiLabel: "AI Explanation",
+    lessonLabel: "Lesson",
+    shareLabel: "Share",
+    copied: "Copied!",
+    footer: "Source: fawazahmed0/hadith-api · Explanations: AI via OpenRouter · May it be beneficial 🤲",
+    topics: ["patience", "prayer", "sustenance", "honesty", "sincerity", "charity", "repentance", "supplication"],
+  },
+  ms: {
+    tagline: "Sunnah in your pocket",
+    subtitle: "Cari hadis Nabi ﷺ mengikut tema atau kata kunci, lengkap dengan penjelasan AI",
+    placeholder: "Cari hadis... contoh: sabar, solat, rezeki",
+    searchBtn: "Cari",
+    randomBtn: "Rawak",
+    randomTip: "Tekan Enter atau klik Cari · 🔀 untuk hadis rawak",
+    suggestedTopics: "Cuba cari topik:",
+    loading: "Mencari hadis & menyediakan penjelasan...",
+    noResult: "Tiada hadis ditemui untuk kata kunci tersebut.",
+    noResultSub: "Cuba gunakan perkataan yang lebih umum.",
+    foundLabel: (n, q) => `${n} hadis ditemui untuk "${q}"`,
+    showArabic: "Lihat teks Arab",
+    hideArabic: "Sembunyikan teks Arab",
+    aiLabel: "Penjelasan AI",
+    lessonLabel: "Pengajaran",
+    shareLabel: "Kongsi",
+    copied: "Disalin!",
+    footer: "Sumber: fawazahmed0/hadith-api · Penjelasan: AI via OpenRouter · Semoga bermanfaat 🤲",
+    topics: ["sabar", "solat", "rezeki", "jujur", "ikhlas", "sedekah", "taubat", "doa"],
+  },
+  fil: {
+    tagline: "Sunnah in your pocket",
+    subtitle: "Hanapin ang mga hadith ng Propeta ﷺ ayon sa paksa o keyword, na may paliwanag ng AI",
+    placeholder: "Maghanap ng hadith... hal: pasensya, dasal, kabuhayan",
+    searchBtn: "Hanapin",
+    randomBtn: "Random",
+    randomTip: "Pindutin ang Enter o i-click ang Hanapin · 🔀 para sa random na hadith",
+    suggestedTopics: "Subukang maghanap:",
+    loading: "Naghahanap ng mga hadith at naghahanda ng mga paliwanag...",
+    noResult: "Walang hadith na natagpuan para sa keyword na iyon.",
+    noResultSub: "Subukan ang mas pangkalahatang salita.",
+    foundLabel: (n, q) => `${n} hadith na natagpuan para sa "${q}"`,
+    showArabic: "Ipakita ang tekstong Arabe",
+    hideArabic: "Itago ang tekstong Arabe",
+    aiLabel: "Paliwanag ng AI",
+    lessonLabel: "Aral",
+    shareLabel: "Ibahagi",
+    copied: "Nakopya!",
+    footer: "Pinagmulan: fawazahmed0/hadith-api · Paliwanag: AI via OpenRouter · Nawa ay mapakinabangan 🤲",
+    topics: ["pasensya", "dasal", "kabuhayan", "katapatan", "pagmamahal", "kawanggawa", "pagsisisi", "panalangin"],
+  },
+  ja: {
+    tagline: "Sunnah in your pocket",
+    subtitle: "テーマやキーワードで預言者ﷺのハディースを検索し、AIによる解説付き",
+    placeholder: "ハディースを検索... 例: 忍耐, 礼拝, 糧",
+    searchBtn: "検索",
+    randomBtn: "ランダム",
+    randomTip: "Enterキーまたは検索ボタンをクリック · 🔀 でランダムなハディース",
+    suggestedTopics: "おすすめのトピック:",
+    loading: "ハディースを検索中・解説を準備中...",
+    noResult: "そのキーワードのハディースは見つかりませんでした。",
+    noResultSub: "より一般的な言葉を試してください。",
+    foundLabel: (n, q) => `「${q}」で${n}件のハディースが見つかりました`,
+    showArabic: "アラビア語テキストを表示",
+    hideArabic: "アラビア語テキストを非表示",
+    aiLabel: "AIによる解説",
+    lessonLabel: "教訓",
+    shareLabel: "共有",
+    copied: "コピーしました！",
+    footer: "出典: fawazahmed0/hadith-api · 解説: AI via OpenRouter · お役に立てれば幸いです 🤲",
+    topics: ["忍耐", "礼拝", "糧", "誠実", "誠意", "慈善", "悔悛", "祈り"],
+  },
+  zh: {
+    tagline: "Sunnah in your pocket",
+    subtitle: "按主题或关键词搜索先知ﷺ的圣训，附AI解释",
+    placeholder: "搜索圣训... 例如: 忍耐, 礼拜, 生计",
+    searchBtn: "搜索",
+    randomBtn: "随机",
+    randomTip: "按Enter或点击搜索 · 🔀 随机圣训",
+    suggestedTopics: "尝试搜索:",
+    loading: "正在搜索圣训并准备解释...",
+    noResult: "未找到该关键词的圣训。",
+    noResultSub: "请尝试使用更常见的词语。",
+    foundLabel: (n, q) => `找到"${q}"相关的${n}条圣训`,
+    showArabic: "显示阿拉伯文",
+    hideArabic: "隐藏阿拉伯文",
+    aiLabel: "AI解释",
+    lessonLabel: "启示",
+    shareLabel: "分享",
+    copied: "已复制！",
+    footer: "来源: fawazahmed0/hadith-api · 解释: AI via OpenRouter · 愿有所裨益 🤲",
+    topics: ["忍耐", "礼拜", "生计", "诚实", "虔诚", "慈善", "悔罪", "祈祷"],
+  },
+  ko: {
+    tagline: "Sunnah in your pocket",
+    subtitle: "테마나 키워드로 예언자ﷺ의 하디스를 검색하고 AI 해설을 확인하세요",
+    placeholder: "하디스 검색... 예: 인내, 기도, 생계",
+    searchBtn: "검색",
+    randomBtn: "랜덤",
+    randomTip: "Enter를 누르거나 검색을 클릭 · 🔀 랜덤 하디스",
+    suggestedTopics: "추천 주제:",
+    loading: "하디스 검색 및 해설 준비 중...",
+    noResult: "해당 키워드의 하디스를 찾을 수 없습니다.",
+    noResultSub: "더 일반적인 단어를 사용해 보세요.",
+    foundLabel: (n, q) => `"${q}"에 대한 하디스 ${n}개 발견`,
+    showArabic: "아랍어 텍스트 보기",
+    hideArabic: "아랍어 텍스트 숨기기",
+    aiLabel: "AI 해설",
+    lessonLabel: "교훈",
+    shareLabel: "공유",
+    copied: "복사됨!",
+    footer: "출처: fawazahmed0/hadith-api · 해설: AI via OpenRouter · 도움이 되길 바랍니다 🤲",
+    topics: ["인내", "기도", "생계", "정직", "성실", "자선", "회개", "간구"],
+  },
+  th: {
+    tagline: "Sunnah in your pocket",
+    subtitle: "ค้นหาหะดีษของท่านนบีﷺ ตามหัวข้อหรือคำสำคัญ พร้อมคำอธิบายจาก AI",
+    placeholder: "ค้นหาหะดีษ... เช่น: อดทน, ละหมาด, ริซกี",
+    searchBtn: "ค้นหา",
+    randomBtn: "สุ่ม",
+    randomTip: "กด Enter หรือคลิกค้นหา · 🔀 สำหรับหะดีษแบบสุ่ม",
+    suggestedTopics: "ลองค้นหาหัวข้อ:",
+    loading: "กำลังค้นหาหะดีษและเตรียมคำอธิบาย...",
+    noResult: "ไม่พบหะดีษสำหรับคำค้นหานั้น",
+    noResultSub: "ลองใช้คำที่ทั่วไปกว่านี้",
+    foundLabel: (n, q) => `พบหะดีษ ${n} รายการสำหรับ "${q}"`,
+    showArabic: "แสดงข้อความภาษาอาหรับ",
+    hideArabic: "ซ่อนข้อความภาษาอาหรับ",
+    aiLabel: "คำอธิบาย AI",
+    lessonLabel: "บทเรียน",
+    shareLabel: "แชร์",
+    copied: "คัดลอกแล้ว!",
+    footer: "แหล่งที่มา: fawazahmed0/hadith-api · คำอธิบาย: AI via OpenRouter · หวังว่าจะเป็นประโยชน์ 🤲",
+    topics: ["อดทน", "ละหมาด", "ริซกี", "ซื่อสัตย์", "บริสุทธิ์ใจ", "ทาน", "เตาบะฮ์", "ดุอา"],
+  },
+  es: {
+    tagline: "Sunnah in your pocket",
+    subtitle: "Encuentra hadices del Profeta ﷺ por tema o palabra clave, con explicaciones de IA",
+    placeholder: "Buscar hadiz... ej: paciencia, oración, sustento",
+    searchBtn: "Buscar",
+    randomBtn: "Aleatorio",
+    randomTip: "Presiona Enter o haz clic en Buscar · 🔀 para un hadiz aleatorio",
+    suggestedTopics: "Prueba buscar:",
+    loading: "Buscando hadices y preparando explicaciones...",
+    noResult: "No se encontraron hadices para esa palabra clave.",
+    noResultSub: "Intenta usar una palabra más general.",
+    foundLabel: (n, q) => `${n} hadices encontrados para "${q}"`,
+    showArabic: "Mostrar texto árabe",
+    hideArabic: "Ocultar texto árabe",
+    aiLabel: "Explicación de IA",
+    lessonLabel: "Lección",
+    shareLabel: "Compartir",
+    copied: "¡Copiado!",
+    footer: "Fuente: fawazahmed0/hadith-api · Explicaciones: IA via OpenRouter · Que sea de beneficio 🤲",
+    topics: ["paciencia", "oración", "sustento", "honestidad", "sinceridad", "caridad", "arrepentimiento", "súplica"],
+  },
+  de: {
+    tagline: "Sunnah in your pocket",
+    subtitle: "Finde Hadithe des Propheten ﷺ nach Thema oder Stichwort, mit KI-Erklärungen",
+    placeholder: "Hadith suchen... z.B: Geduld, Gebet, Lebensunterhalt",
+    searchBtn: "Suchen",
+    randomBtn: "Zufällig",
+    randomTip: "Enter drücken oder Suchen klicken · 🔀 für zufälligen Hadith",
+    suggestedTopics: "Themen ausprobieren:",
+    loading: "Hadithe werden gesucht und Erklärungen vorbereitet...",
+    noResult: "Keine Hadithe für dieses Stichwort gefunden.",
+    noResultSub: "Versuche ein allgemeineres Wort.",
+    foundLabel: (n, q) => `${n} Hadithe gefunden für „${q}"`,
+    showArabic: "Arabischen Text anzeigen",
+    hideArabic: "Arabischen Text ausblenden",
+    aiLabel: "KI-Erklärung",
+    lessonLabel: "Lektion",
+    shareLabel: "Teilen",
+    copied: "Kopiert!",
+    footer: "Quelle: fawazahmed0/hadith-api · Erklärungen: KI via OpenRouter · Möge es nützlich sein 🤲",
+    topics: ["Geduld", "Gebet", "Lebensunterhalt", "Ehrlichkeit", "Aufrichtigkeit", "Wohltätigkeit", "Reue", "Bittgebet"],
+  },
+  fr: {
+    tagline: "Sunnah in your pocket",
+    subtitle: "Trouvez les hadiths du Prophète ﷺ par thème ou mot-clé, avec des explications IA",
+    placeholder: "Rechercher un hadith... ex: patience, prière, subsistance",
+    searchBtn: "Rechercher",
+    randomBtn: "Aléatoire",
+    randomTip: "Appuyez sur Entrée ou cliquez sur Rechercher · 🔀 pour un hadith aléatoire",
+    suggestedTopics: "Essayez de rechercher:",
+    loading: "Recherche de hadiths et préparation des explications...",
+    noResult: "Aucun hadith trouvé pour ce mot-clé.",
+    noResultSub: "Essayez d'utiliser un mot plus général.",
+    foundLabel: (n, q) => `${n} hadiths trouvés pour « ${q} »`,
+    showArabic: "Afficher le texte arabe",
+    hideArabic: "Masquer le texte arabe",
+    aiLabel: "Explication IA",
+    lessonLabel: "Leçon",
+    shareLabel: "Partager",
+    copied: "Copié !",
+    footer: "Source: fawazahmed0/hadith-api · Explications: IA via OpenRouter · Puisse-t-il être bénéfique 🤲",
+    topics: ["patience", "prière", "subsistance", "honnêteté", "sincérité", "charité", "repentir", "supplication"],
+  },
+};
