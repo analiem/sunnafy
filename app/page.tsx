@@ -2,7 +2,6 @@
 import { useState, useCallback, useEffect } from "react";
 import SearchBar from "@/components/SearchBar";
 import HadithCard from "@/components/HadithCard";
-import LangSelector from "@/components/LangSelector";
 import ThemeToggle from "@/components/ThemeToggle";
 import BookmarkPanel from "@/components/BookmarkPanel";
 import { UI_TEXT, BOOK_LIST, type LangCode } from "@/lib/languages";
@@ -105,7 +104,6 @@ export default function Home() {
               )}
             </button>
             <ThemeToggle />
-            <LangSelector current={lang} onChange={setLang} />
           </div>
         </div>
       </nav>
