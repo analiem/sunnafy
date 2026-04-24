@@ -1,11 +1,12 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import SearchBar from "@/components/SearchBar";
 import HadithCard from "@/components/HadithCard";
 import LangSelector from "@/components/LangSelector";
 import ThemeToggle from "@/components/ThemeToggle";
-import { UI_TEXT, type LangCode } from "@/lib/languages";
-import { BookOpen } from "lucide-react";
+import BookmarkPanel from "@/components/BookmarkPanel";
+import { UI_TEXT, BOOK_LIST, type LangCode } from "@/lib/languages";
+import { BookOpen, Bookmark } from "lucide-react";
 
 export interface HadithResult {
   arabic: string;
@@ -24,11 +25,36 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState("");
+  const [filterBook, setFilterBook] = useState("all");
+  const [bookmarks, setBookmarks] = useState<HadithResult[]>([]);
+  const [showBookmarks, setShowBookmarks] = useState(false);
   const t = UI_TEXT[lang];
+
+  // Load bookmarks from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("sunnafy-bookmarks");
+      if (saved) setBookmarks(JSON.parse(saved));
+    } catch {}
+  }, []);
+
+  const saveBookmarks = (bm: HadithResult[]) => {
+    setBookmarks(bm);
+    try { localStorage.setItem("sunnafy-bookmarks", JSON.stringify(bm)); } catch {}
+  };
+
+  const toggleBookmark = (h: HadithResult) => {
+    const key = `${h.book}-${h.number}`;
+    const exists = bookmarks.find(b => `${b.book}-${b.number}` === key);
+    if (exists) saveBookmarks(bookmarks.filter(b => `${b.book}-${b.number}` !== key));
+    else saveBookmarks([h, ...bookmarks]);
+  };
+
+  const isBookmarked = (h: HadithResult) => !!bookmarks.find(b => `${b.book}-${b.number}` === `${h.book}-${h.number}`);
 
   const handleSearch = useCallback(async (q: string) => {
     if (!q.trim()) return;
-    setLoading(true); setSearched(true); setError(""); setResults([]); setQuery(q);
+    setLoading(true); setSearched(true); setError(""); setResults([]); setQuery(q); setFilterBook("all");
     try {
       const res = await fetch("/api/search", {
         method: "POST",
@@ -43,7 +69,7 @@ export default function Home() {
   }, [lang]);
 
   const handleRandom = useCallback(async () => {
-    setLoading(true); setSearched(true); setError(""); setResults([]); setQuery("—");
+    setLoading(true); setSearched(true); setError(""); setResults([]); setQuery("—"); setFilterBook("all");
     try {
       const res = await fetch(`/api/random?lang=${lang}`);
       if (!res.ok) throw new Error();
@@ -53,23 +79,38 @@ export default function Home() {
     finally { setLoading(false); }
   }, [lang]);
 
+  const filteredResults = filterBook === "all" ? results : results.filter(r => r.book === filterBook);
+  const availableBooks = BOOK_LIST.filter(b => b.key === "all" || results.some(r => r.book === b.key));
+
   return (
     <div className="min-h-screen bg-page">
       {/* Navbar */}
-      <nav className="sticky top-0 z-30 bg-page border-b border-default backdrop-blur-sm bg-opacity-90">
-        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
+      <nav className="sticky top-0 z-30 bg-page border-b border-default backdrop-blur-sm">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-lg">☽</span>
             <span className="font-bold text-primary tracking-tight">Sunnafy</span>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowBookmarks(true)}
+              className="relative flex items-center gap-1.5 px-3 py-2 rounded-xl border border-default hover:bg-page-2 transition-colors text-sm text-secondary"
+            >
+              <Bookmark size={14} />
+              <span className="hidden sm:inline">{t.bookmarksTitle}</span>
+              {bookmarks.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold">
+                  {bookmarks.length}
+                </span>
+              )}
+            </button>
             <ThemeToggle />
             <LangSelector current={lang} onChange={setLang} />
           </div>
         </div>
       </nav>
 
-      <main className="max-w-2xl mx-auto px-4 py-12">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
         {/* Hero */}
         <div className="text-center mb-10 animate-fade-in">
           <div className="inline-flex items-center gap-1.5 text-xs font-medium text-green bg-green-subtle px-3 py-1.5 rounded-full mb-5">
@@ -78,9 +119,7 @@ export default function Home() {
           <h1 className="text-4xl sm:text-5xl font-bold text-primary mb-3 tracking-tight">
             Sunna<span className="text-green">fy</span>
           </h1>
-          <p className="text-secondary text-base max-w-sm mx-auto leading-relaxed">
-            {t.subtitle}
-          </p>
+          <p className="text-secondary text-base max-w-md mx-auto leading-relaxed">{t.subtitle}</p>
         </div>
 
         {/* Search */}
@@ -92,11 +131,8 @@ export default function Home() {
             <p className="text-muted text-xs mb-3 uppercase tracking-widest">{t.suggestedTopics}</p>
             <div className="flex flex-wrap justify-center gap-2">
               {t.topics.map(topic => (
-                <button
-                  key={topic}
-                  onClick={() => handleSearch(topic)}
-                  className="px-3.5 py-1.5 rounded-full border border-default text-secondary text-sm hover:bg-page-2 hover:border-default-2 transition-colors"
-                >
+                <button key={topic} onClick={() => handleSearch(topic)}
+                  className="px-3.5 py-1.5 rounded-full border border-default text-secondary text-sm hover:bg-page-2 hover:border-default-2 transition-colors">
                   {topic}
                 </button>
               ))}
@@ -114,9 +150,7 @@ export default function Home() {
 
         {/* Error */}
         {error && (
-          <div className="mt-6 p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm text-center">
-            {error}
-          </div>
+          <div className="mt-6 p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm text-center">{error}</div>
         )}
 
         {/* No results */}
@@ -128,28 +162,84 @@ export default function Home() {
           </div>
         )}
 
-        {/* Results */}
+        {/* Filter & Results */}
         {results.length > 0 && !loading && (
           <div className="mt-8">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="h-px flex-1 bg-border" style={{background:"var(--border)"}} />
-              <p className="text-muted text-xs shrink-0">{t.foundLabel(results.length, query)}</p>
-              <div className="h-px flex-1 bg-border" style={{background:"var(--border)"}} />
+            {/* Filter bar */}
+            <div className="flex items-center gap-2 mb-5 flex-wrap">
+              <span className="text-xs text-muted uppercase tracking-widest mr-1">{t.filterLabel}:</span>
+              {availableBooks.map(book => (
+                <button
+                  key={book.key}
+                  onClick={() => setFilterBook(book.key)}
+                  className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                    filterBook === book.key
+                      ? "bg-green-700 dark:bg-green-600 text-white border-transparent"
+                      : "border-default text-secondary hover:bg-page-2"
+                  }`}
+                >
+                  {book[lang as keyof typeof book]}
+                </button>
+              ))}
             </div>
-            <div className="space-y-4">
-              {results.map((hadith, i) => (
-                <HadithCard key={i} hadith={hadith} index={i} lang={lang} />
+
+            {/* Count */}
+            <div className="flex items-center gap-3 mb-5">
+              <div className="h-px flex-1" style={{background:"var(--border)"}} />
+              <p className="text-muted text-xs shrink-0">{t.foundLabel(filteredResults.length, query)}</p>
+              <div className="h-px flex-1" style={{background:"var(--border)"}} />
+            </div>
+
+            {/* Cards */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {filteredResults.map((hadith, i) => (
+                <HadithCard key={`${hadith.book}-${hadith.number}`} hadith={hadith} index={i} lang={lang}
+                  onBookmark={toggleBookmark} isBookmarked={isBookmarked(hadith)} />
               ))}
             </div>
           </div>
         )}
 
-        {/* Footer */}
-        <footer className="mt-16 pt-8 border-t border-default text-center">
-          <p className="text-xs font-semibold text-muted mb-1">Sunnafy</p>
-          <p className="text-xs text-muted">{t.footer}</p>
+        {/* ============================================
+            FOOTER — Edit bagian ini untuk kustomisasi
+            ============================================ */}
+        <footer className="mt-20 pt-8 border-t border-default">
+          {/* Donasi QRIS — ganti src dengan link gambar QRIS kamu */}
+          {/* Hapus komentar di bawah ini untuk mengaktifkan section donasi */}
+          {/*
+          <div className="text-center mb-10 p-6 bg-page-2 rounded-2xl border border-default">
+            <h3 className="font-semibold text-primary mb-1">{t.donationTitle}</h3>
+            <p className="text-secondary text-sm mb-4">{t.donationDesc}</p>
+            <img
+              src="/qris.png"
+              alt="QRIS Donasi Sunnafy"
+              className="w-48 h-48 mx-auto rounded-xl object-contain"
+            />
+            <p className="text-xs text-muted mt-3">Scan QRIS di atas untuk berdonasi</p>
+          </div>
+          */}
+
+          {/* Footer text — edit bebas di sini */}
+          <div className="text-center">
+            <p className="text-xs font-semibold text-muted mb-1">Sunnafy</p>
+            {/* Ganti teks footer di bawah sesuai keinginan */}
+            <p className="text-xs text-muted">{t.footer}</p>
+            <p className="text-xs text-muted mt-1">{t.footerCredit}</p>
+            {/* Tambah link atau info lain di bawah ini */}
+            {/* <p className="text-xs text-muted mt-1">Kontak: email@kamu.com</p> */}
+          </div>
         </footer>
       </main>
+
+      {/* Bookmark Panel */}
+      {showBookmarks && (
+        <BookmarkPanel
+          bookmarks={bookmarks}
+          lang={lang}
+          onClose={() => setShowBookmarks(false)}
+          onRemove={(key) => saveBookmarks(bookmarks.filter(b => `${b.book}-${b.number}` !== key))}
+        />
+      )}
     </div>
   );
 }

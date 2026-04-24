@@ -1,15 +1,5 @@
 export type LangCode =
-  | "id"
-  | "en"
-  | "ms"
-  | "fil"
-  | "ja"
-  | "zh"
-  | "ko"
-  | "th"
-  | "es"
-  | "de"
-  | "fr";
+  | "id" | "en" | "ms" | "fil" | "ja" | "zh" | "ko" | "th" | "es" | "de" | "fr";
 
 export interface Language {
   code: LangCode;
@@ -32,6 +22,16 @@ export const LANGUAGES: Language[] = [
   { code: "fr", label: "Français", flag: "🇫🇷", dir: "ltr" },
 ];
 
+export const BOOK_LIST = [
+  { key: "all", id: "Semua Kitab", en: "All Books", ms: "Semua Kitab", fil: "Lahat ng Aklat", ja: "全書", zh: "全部", ko: "전체", th: "ทั้งหมด", es: "Todos", de: "Alle", fr: "Tous" },
+  { key: "bukhari", id: "Shahih Bukhari", en: "Sahih Bukhari", ms: "Sahih Bukhari", fil: "Sahih Bukhari", ja: "ブハーリー", zh: "布哈里圣训", ko: "부카리", th: "บุคอรี", es: "Sahih Bujari", de: "Sahih Bukhari", fr: "Sahih Boukhari" },
+  { key: "muslim", id: "Shahih Muslim", en: "Sahih Muslim", ms: "Sahih Muslim", fil: "Sahih Muslim", ja: "ムスリム", zh: "穆斯林圣训", ko: "무슬림", th: "มุสลิม", es: "Sahih Muslim", de: "Sahih Muslim", fr: "Sahih Muslim" },
+  { key: "abudawud", id: "Sunan Abu Dawud", en: "Sunan Abu Dawud", ms: "Sunan Abu Dawud", fil: "Sunan Abu Dawud", ja: "アブー・ダーウード", zh: "艾布达伍德圣训", ko: "아부다우드", th: "อบูดาวูด", es: "Sunan Abu Dawud", de: "Sunan Abu Dawud", fr: "Sunan Abou Dawoud" },
+  { key: "tirmidhi", id: "Sunan Tirmidzi", en: "Sunan Tirmidhi", ms: "Sunan Tirmizi", fil: "Sunan Tirmidhi", ja: "ティルミズィー", zh: "提尔米齐圣训", ko: "티르미디", th: "ติรมีซี", es: "Sunan Tirmidhi", de: "Sunan Tirmidhi", fr: "Sunan Tirmidhi" },
+  { key: "nasai", id: "Sunan An-Nasa'i", en: "Sunan An-Nasa'i", ms: "Sunan An-Nasai", fil: "Sunan An-Nasa'i", ja: "ナサーイー", zh: "纳萨伊圣训", ko: "나사이", th: "นะซาอี", es: "Sunan An-Nasa'i", de: "Sunan An-Nasa'i", fr: "Sunan An-Nasa'i" },
+  { key: "ibnmajah", id: "Sunan Ibnu Majah", en: "Sunan Ibn Majah", ms: "Sunan Ibn Majah", fil: "Sunan Ibn Majah", ja: "イブン・マージャ", zh: "伊本马贾圣训", ko: "이븐마자", th: "อิบนุมาญะฮ์", es: "Sunan Ibn Mayah", de: "Sunan Ibn Majah", fr: "Sunan Ibn Majah" },
+];
+
 export const UI_TEXT: Record<LangCode, {
   tagline: string;
   subtitle: string;
@@ -44,13 +44,23 @@ export const UI_TEXT: Record<LangCode, {
   noResult: string;
   noResultSub: string;
   foundLabel: (n: number, q: string) => string;
+  showFull: string;
+  hideFull: string;
   showArabic: string;
   hideArabic: string;
   aiLabel: string;
   lessonLabel: string;
   shareLabel: string;
   copied: string;
+  bookmarkAdd: string;
+  bookmarkRemove: string;
+  bookmarksTitle: string;
+  bookmarksEmpty: string;
+  filterLabel: string;
   footer: string;
+  footerCredit: string;
+  donationTitle: string;
+  donationDesc: string;
   topics: string[];
 }> = {
   id: {
@@ -65,13 +75,23 @@ export const UI_TEXT: Record<LangCode, {
     noResult: "Tidak ditemukan hadis untuk kata kunci tersebut.",
     noResultSub: "Coba gunakan kata yang lebih umum.",
     foundLabel: (n, q) => `${n} hadis ditemukan untuk "${q}"`,
+    showFull: "Lihat hadis lengkap",
+    hideFull: "Sembunyikan",
     showArabic: "Lihat teks Arab",
     hideArabic: "Sembunyikan teks Arab",
     aiLabel: "Penjelasan AI",
     lessonLabel: "Pelajaran",
     shareLabel: "Bagikan",
     copied: "Disalin!",
-    footer: "Sumber: fawazahmed0/hadith-api · Penjelasan: AI via OpenRouter · Semoga bermanfaat 🤲",
+    bookmarkAdd: "Simpan",
+    bookmarkRemove: "Hapus simpanan",
+    bookmarksTitle: "Hadis Tersimpan",
+    bookmarksEmpty: "Belum ada hadis yang disimpan.",
+    filterLabel: "Filter kitab",
+    footer: "Sumber: fawazahmed0/hadith-api · Penjelasan: Groq AI · Semoga bermanfaat 🤲",
+    footerCredit: "Dibuat dengan ❤️ untuk umat",
+    donationTitle: "Dukung Sunnafy",
+    donationDesc: "Bantu kami terus mengembangkan platform ini",
     topics: ["sabar", "sholat", "rezeki", "jujur", "ikhlas", "sedekah", "taubat", "doa"],
   },
   en: {
@@ -86,13 +106,23 @@ export const UI_TEXT: Record<LangCode, {
     noResult: "No hadiths found for that keyword.",
     noResultSub: "Try using a more general word.",
     foundLabel: (n, q) => `${n} hadiths found for "${q}"`,
+    showFull: "Show full hadith",
+    hideFull: "Hide",
     showArabic: "Show Arabic text",
     hideArabic: "Hide Arabic text",
     aiLabel: "AI Explanation",
     lessonLabel: "Lesson",
     shareLabel: "Share",
     copied: "Copied!",
-    footer: "Source: fawazahmed0/hadith-api · Explanations: AI via OpenRouter · May it be beneficial 🤲",
+    bookmarkAdd: "Bookmark",
+    bookmarkRemove: "Remove bookmark",
+    bookmarksTitle: "Saved Hadiths",
+    bookmarksEmpty: "No saved hadiths yet.",
+    filterLabel: "Filter by book",
+    footer: "Source: fawazahmed0/hadith-api · Explanations: Groq AI · May it be beneficial 🤲",
+    footerCredit: "Made with ❤️ for the ummah",
+    donationTitle: "Support Sunnafy",
+    donationDesc: "Help us keep developing this platform",
     topics: ["patience", "prayer", "sustenance", "honesty", "sincerity", "charity", "repentance", "supplication"],
   },
   ms: {
@@ -107,13 +137,23 @@ export const UI_TEXT: Record<LangCode, {
     noResult: "Tiada hadis ditemui untuk kata kunci tersebut.",
     noResultSub: "Cuba gunakan perkataan yang lebih umum.",
     foundLabel: (n, q) => `${n} hadis ditemui untuk "${q}"`,
+    showFull: "Lihat hadis penuh",
+    hideFull: "Sembunyikan",
     showArabic: "Lihat teks Arab",
     hideArabic: "Sembunyikan teks Arab",
     aiLabel: "Penjelasan AI",
     lessonLabel: "Pengajaran",
     shareLabel: "Kongsi",
     copied: "Disalin!",
-    footer: "Sumber: fawazahmed0/hadith-api · Penjelasan: AI via OpenRouter · Semoga bermanfaat 🤲",
+    bookmarkAdd: "Simpan",
+    bookmarkRemove: "Buang simpanan",
+    bookmarksTitle: "Hadis Tersimpan",
+    bookmarksEmpty: "Tiada hadis tersimpan lagi.",
+    filterLabel: "Tapis kitab",
+    footer: "Sumber: fawazahmed0/hadith-api · Penjelasan: Groq AI · Semoga bermanfaat 🤲",
+    footerCredit: "Dibuat dengan ❤️ untuk umat",
+    donationTitle: "Sokong Sunnafy",
+    donationDesc: "Bantu kami terus membangunkan platform ini",
     topics: ["sabar", "solat", "rezeki", "jujur", "ikhlas", "sedekah", "taubat", "doa"],
   },
   fil: {
@@ -128,13 +168,23 @@ export const UI_TEXT: Record<LangCode, {
     noResult: "Walang hadith na natagpuan para sa keyword na iyon.",
     noResultSub: "Subukan ang mas pangkalahatang salita.",
     foundLabel: (n, q) => `${n} hadith na natagpuan para sa "${q}"`,
+    showFull: "Ipakita ang buong hadith",
+    hideFull: "Itago",
     showArabic: "Ipakita ang tekstong Arabe",
     hideArabic: "Itago ang tekstong Arabe",
     aiLabel: "Paliwanag ng AI",
     lessonLabel: "Aral",
     shareLabel: "Ibahagi",
     copied: "Nakopya!",
-    footer: "Pinagmulan: fawazahmed0/hadith-api · Paliwanag: AI via OpenRouter · Nawa ay mapakinabangan 🤲",
+    bookmarkAdd: "I-save",
+    bookmarkRemove: "Alisin",
+    bookmarksTitle: "Mga Na-save na Hadith",
+    bookmarksEmpty: "Wala pang na-save na hadith.",
+    filterLabel: "I-filter ayon sa aklat",
+    footer: "Pinagmulan: fawazahmed0/hadith-api · Paliwanag: Groq AI · Nawa ay mapakinabangan 🤲",
+    footerCredit: "Ginawa nang may ❤️ para sa ummah",
+    donationTitle: "Suportahan ang Sunnafy",
+    donationDesc: "Tulungan kaming patuloy na paunlarin ang platform na ito",
     topics: ["pasensya", "dasal", "kabuhayan", "katapatan", "pagmamahal", "kawanggawa", "pagsisisi", "panalangin"],
   },
   ja: {
@@ -149,13 +199,23 @@ export const UI_TEXT: Record<LangCode, {
     noResult: "そのキーワードのハディースは見つかりませんでした。",
     noResultSub: "より一般的な言葉を試してください。",
     foundLabel: (n, q) => `「${q}」で${n}件のハディースが見つかりました`,
+    showFull: "ハディース全文を表示",
+    hideFull: "非表示",
     showArabic: "アラビア語テキストを表示",
     hideArabic: "アラビア語テキストを非表示",
     aiLabel: "AIによる解説",
     lessonLabel: "教訓",
     shareLabel: "共有",
     copied: "コピーしました！",
-    footer: "出典: fawazahmed0/hadith-api · 解説: AI via OpenRouter · お役に立てれば幸いです 🤲",
+    bookmarkAdd: "保存",
+    bookmarkRemove: "削除",
+    bookmarksTitle: "保存済みハディース",
+    bookmarksEmpty: "保存されたハディースはまだありません。",
+    filterLabel: "書籍でフィルター",
+    footer: "出典: fawazahmed0/hadith-api · 解説: Groq AI · お役に立てれば幸いです 🤲",
+    footerCredit: "ウンマのために❤️で作られました",
+    donationTitle: "Sunnafyをサポート",
+    donationDesc: "このプラットフォームの開発を続けるためにご支援ください",
     topics: ["忍耐", "礼拝", "糧", "誠実", "誠意", "慈善", "悔悛", "祈り"],
   },
   zh: {
@@ -170,13 +230,23 @@ export const UI_TEXT: Record<LangCode, {
     noResult: "未找到该关键词的圣训。",
     noResultSub: "请尝试使用更常见的词语。",
     foundLabel: (n, q) => `找到"${q}"相关的${n}条圣训`,
+    showFull: "显示完整圣训",
+    hideFull: "隐藏",
     showArabic: "显示阿拉伯文",
     hideArabic: "隐藏阿拉伯文",
     aiLabel: "AI解释",
     lessonLabel: "启示",
     shareLabel: "分享",
     copied: "已复制！",
-    footer: "来源: fawazahmed0/hadith-api · 解释: AI via OpenRouter · 愿有所裨益 🤲",
+    bookmarkAdd: "收藏",
+    bookmarkRemove: "取消收藏",
+    bookmarksTitle: "已收藏圣训",
+    bookmarksEmpty: "暂无收藏的圣训。",
+    filterLabel: "按书籍筛选",
+    footer: "来源: fawazahmed0/hadith-api · 解释: Groq AI · 愿有所裨益 🤲",
+    footerCredit: "用❤️为乌玛制作",
+    donationTitle: "支持Sunnafy",
+    donationDesc: "帮助我们继续开发这个平台",
     topics: ["忍耐", "礼拜", "生计", "诚实", "虔诚", "慈善", "悔罪", "祈祷"],
   },
   ko: {
@@ -191,13 +261,23 @@ export const UI_TEXT: Record<LangCode, {
     noResult: "해당 키워드의 하디스를 찾을 수 없습니다.",
     noResultSub: "더 일반적인 단어를 사용해 보세요.",
     foundLabel: (n, q) => `"${q}"에 대한 하디스 ${n}개 발견`,
+    showFull: "전체 하디스 보기",
+    hideFull: "숨기기",
     showArabic: "아랍어 텍스트 보기",
     hideArabic: "아랍어 텍스트 숨기기",
     aiLabel: "AI 해설",
     lessonLabel: "교훈",
     shareLabel: "공유",
     copied: "복사됨!",
-    footer: "출처: fawazahmed0/hadith-api · 해설: AI via OpenRouter · 도움이 되길 바랍니다 🤲",
+    bookmarkAdd: "저장",
+    bookmarkRemove: "삭제",
+    bookmarksTitle: "저장된 하디스",
+    bookmarksEmpty: "저장된 하디스가 없습니다.",
+    filterLabel: "책으로 필터",
+    footer: "출처: fawazahmed0/hadith-api · 해설: Groq AI · 도움이 되길 바랍니다 🤲",
+    footerCredit: "움마를 위해 ❤️로 만들었습니다",
+    donationTitle: "Sunnafy 지원하기",
+    donationDesc: "이 플랫폼을 계속 개발할 수 있도록 도와주세요",
     topics: ["인내", "기도", "생계", "정직", "성실", "자선", "회개", "간구"],
   },
   th: {
@@ -212,13 +292,23 @@ export const UI_TEXT: Record<LangCode, {
     noResult: "ไม่พบหะดีษสำหรับคำค้นหานั้น",
     noResultSub: "ลองใช้คำที่ทั่วไปกว่านี้",
     foundLabel: (n, q) => `พบหะดีษ ${n} รายการสำหรับ "${q}"`,
+    showFull: "แสดงหะดีษทั้งหมด",
+    hideFull: "ซ่อน",
     showArabic: "แสดงข้อความภาษาอาหรับ",
     hideArabic: "ซ่อนข้อความภาษาอาหรับ",
     aiLabel: "คำอธิบาย AI",
     lessonLabel: "บทเรียน",
     shareLabel: "แชร์",
     copied: "คัดลอกแล้ว!",
-    footer: "แหล่งที่มา: fawazahmed0/hadith-api · คำอธิบาย: AI via OpenRouter · หวังว่าจะเป็นประโยชน์ 🤲",
+    bookmarkAdd: "บันทึก",
+    bookmarkRemove: "ลบ",
+    bookmarksTitle: "หะดีษที่บันทึกไว้",
+    bookmarksEmpty: "ยังไม่มีหะดีษที่บันทึกไว้",
+    filterLabel: "กรองตามหนังสือ",
+    footer: "แหล่งที่มา: fawazahmed0/hadith-api · คำอธิบาย: Groq AI · หวังว่าจะเป็นประโยชน์ 🤲",
+    footerCredit: "สร้างด้วย ❤️ เพื่ออุมมะฮ์",
+    donationTitle: "สนับสนุน Sunnafy",
+    donationDesc: "ช่วยเราพัฒนาแพลตฟอร์มนี้ต่อไป",
     topics: ["อดทน", "ละหมาด", "ริซกี", "ซื่อสัตย์", "บริสุทธิ์ใจ", "ทาน", "เตาบะฮ์", "ดุอา"],
   },
   es: {
@@ -233,13 +323,23 @@ export const UI_TEXT: Record<LangCode, {
     noResult: "No se encontraron hadices para esa palabra clave.",
     noResultSub: "Intenta usar una palabra más general.",
     foundLabel: (n, q) => `${n} hadices encontrados para "${q}"`,
+    showFull: "Ver hadiz completo",
+    hideFull: "Ocultar",
     showArabic: "Mostrar texto árabe",
     hideArabic: "Ocultar texto árabe",
     aiLabel: "Explicación de IA",
     lessonLabel: "Lección",
     shareLabel: "Compartir",
     copied: "¡Copiado!",
-    footer: "Fuente: fawazahmed0/hadith-api · Explicaciones: IA via OpenRouter · Que sea de beneficio 🤲",
+    bookmarkAdd: "Guardar",
+    bookmarkRemove: "Eliminar",
+    bookmarksTitle: "Hadices Guardados",
+    bookmarksEmpty: "No hay hadices guardados aún.",
+    filterLabel: "Filtrar por libro",
+    footer: "Fuente: fawazahmed0/hadith-api · Explicaciones: Groq AI · Que sea de beneficio 🤲",
+    footerCredit: "Hecho con ❤️ para la ummah",
+    donationTitle: "Apoyar Sunnafy",
+    donationDesc: "Ayúdanos a seguir desarrollando esta plataforma",
     topics: ["paciencia", "oración", "sustento", "honestidad", "sinceridad", "caridad", "arrepentimiento", "súplica"],
   },
   de: {
@@ -254,13 +354,23 @@ export const UI_TEXT: Record<LangCode, {
     noResult: "Keine Hadithe für dieses Stichwort gefunden.",
     noResultSub: "Versuche ein allgemeineres Wort.",
     foundLabel: (n, q) => `${n} Hadithe gefunden für „${q}"`,
+    showFull: "Vollständigen Hadith anzeigen",
+    hideFull: "Ausblenden",
     showArabic: "Arabischen Text anzeigen",
     hideArabic: "Arabischen Text ausblenden",
     aiLabel: "KI-Erklärung",
     lessonLabel: "Lektion",
     shareLabel: "Teilen",
     copied: "Kopiert!",
-    footer: "Quelle: fawazahmed0/hadith-api · Erklärungen: KI via OpenRouter · Möge es nützlich sein 🤲",
+    bookmarkAdd: "Speichern",
+    bookmarkRemove: "Entfernen",
+    bookmarksTitle: "Gespeicherte Hadithe",
+    bookmarksEmpty: "Noch keine gespeicherten Hadithe.",
+    filterLabel: "Nach Buch filtern",
+    footer: "Quelle: fawazahmed0/hadith-api · Erklärungen: Groq AI · Möge es nützlich sein 🤲",
+    footerCredit: "Mit ❤️ für die Ummah gemacht",
+    donationTitle: "Sunnafy unterstützen",
+    donationDesc: "Hilf uns, diese Plattform weiterzuentwickeln",
     topics: ["Geduld", "Gebet", "Lebensunterhalt", "Ehrlichkeit", "Aufrichtigkeit", "Wohltätigkeit", "Reue", "Bittgebet"],
   },
   fr: {
@@ -275,13 +385,23 @@ export const UI_TEXT: Record<LangCode, {
     noResult: "Aucun hadith trouvé pour ce mot-clé.",
     noResultSub: "Essayez d'utiliser un mot plus général.",
     foundLabel: (n, q) => `${n} hadiths trouvés pour « ${q} »`,
+    showFull: "Voir le hadith complet",
+    hideFull: "Masquer",
     showArabic: "Afficher le texte arabe",
     hideArabic: "Masquer le texte arabe",
     aiLabel: "Explication IA",
     lessonLabel: "Leçon",
     shareLabel: "Partager",
     copied: "Copié !",
-    footer: "Source: fawazahmed0/hadith-api · Explications: IA via OpenRouter · Puisse-t-il être bénéfique 🤲",
+    bookmarkAdd: "Enregistrer",
+    bookmarkRemove: "Supprimer",
+    bookmarksTitle: "Hadiths Enregistrés",
+    bookmarksEmpty: "Aucun hadith enregistré pour l'instant.",
+    filterLabel: "Filtrer par livre",
+    footer: "Source: fawazahmed0/hadith-api · Explications: Groq AI · Puisse-t-il être bénéfique 🤲",
+    footerCredit: "Fait avec ❤️ pour la oummah",
+    donationTitle: "Soutenir Sunnafy",
+    donationDesc: "Aidez-nous à continuer à développer cette plateforme",
     topics: ["patience", "prière", "subsistance", "honnêteté", "sincérité", "charité", "repentir", "supplication"],
   },
 };

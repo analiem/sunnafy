@@ -11,40 +11,41 @@ const LANG_NAMES: Record<string, string> = {
   es: "Spanish", de: "German", fr: "French",
 };
 
-async function getExplanation(text: string, source: string, lang: string) {
+async function groqCall(prompt: string, system: string): Promise<string> {
   const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) return { explanation: "", lesson: "" };
+  if (!apiKey) return "";
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model: "llama-3.3-70b-versatile",
+      max_tokens: 500,
+      temperature: 0.4,
+      messages: [{ role: "system", content: system }, { role: "user", content: prompt }],
+    }),
+  });
+  if (!res.ok) return "";
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || "";
+}
+
+async function getFullResponse(indonesianText: string, source: string, lang: string) {
   const targetLang = LANG_NAMES[lang] || "bahasa Indonesia";
+  const isId = lang === "id";
   try {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
-        max_tokens: 300,
-        temperature: 0.5,
-        messages: [{
-          role: "system",
-          content: `You are an Islamic scholar assistant. Always respond in ${targetLang}. Be concise and clear.`,
-        }, {
-          role: "user",
-          content: `Explain this hadith from ${source} in 2-3 sentences in ${targetLang}. Then give 1 short practical lesson for daily life.
+    const systemPrompt = `You are an Islamic scholar assistant. Always respond ONLY in ${targetLang}. Be concise and accurate.`;
+    const userPrompt = isId
+      ? `Jelaskan hadis dari ${source} dalam 2-3 kalimat bahasa Indonesia. Berikan 1 pelajaran praktis.\n\nHadis: "${indonesianText}"\n\nBalas HANYA JSON:\n{"explanation":"...","lesson":"...","translation":""}`
+      : `For this hadith from ${source}, translate to ${targetLang}, explain in 2-3 sentences, and give 1 practical lesson.\n\nHadith (Indonesian): "${indonesianText}"\n\nReply ONLY JSON:\n{"translation":"...","explanation":"...","lesson":"..."}`;
 
-Hadith: "${text}"
-
-Respond ONLY with valid JSON, no markdown:
-{"explanation":"...","lesson":"..."}`,
-        }],
-      }),
-    });
-    if (!res.ok) return { explanation: "", lesson: "" };
-    const data = await res.json();
-    const raw = data.choices?.[0]?.message?.content || "";
-    const clean = raw.replace(/```json|```/g, "").trim();
-    const parsed = JSON.parse(clean);
-    return { explanation: parsed.explanation || "", lesson: parsed.lesson || "" };
+    const raw = await groqCall(userPrompt, systemPrompt);
+    if (!raw) return { explanation: "", lesson: "", translation: "" };
+    const match = raw.replace(/```json|```/g, "").trim().match(/\{[\s\S]*\}/);
+    if (!match) return { explanation: "", lesson: "", translation: "" };
+    const parsed = JSON.parse(match[0]);
+    return { explanation: parsed.explanation || "", lesson: parsed.lesson || "", translation: parsed.translation || "" };
   } catch {
-    return { explanation: "", lesson: "" };
+    return { explanation: "", lesson: "", translation: "" };
   }
 }
 
@@ -61,8 +62,12 @@ export async function GET(req: NextRequest) {
     const shuffled = [...hadiths].sort(() => Math.random() - 0.5).slice(0, 3);
     const results = await Promise.all((shuffled as any[]).map(async (h) => {
       const text = h.text || h.translation || "";
-      const { explanation, lesson } = await getExplanation(text, source, lang);
-      return { arabic: h.arabic || h.arab || "", indonesia: text, source, number: h.hadithnumber || h.number || 0, book, explanation, lesson };
+      const { explanation, lesson, translation } = await getFullResponse(text, source, lang);
+      return {
+        arabic: h.arabic || h.arab || "",
+        indonesia: translation && lang !== "id" ? translation : text,
+        source, number: h.hadithnumber || h.number || 0, book, explanation, lesson,
+      };
     }));
     return NextResponse.json({ results });
   } catch {

@@ -30,45 +30,67 @@ function scoreRelevance(text: string, query: string): number {
   return score;
 }
 
-async function getExplanation(text: string, source: string, lang: string) {
+async function groqCall(prompt: string, system: string): Promise<string> {
   const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) return { explanation: "", lesson: "" };
+  if (!apiKey) return "";
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model: "llama-3.3-70b-versatile",
+      max_tokens: 500,
+      temperature: 0.4,
+      messages: [{ role: "system", content: system }, { role: "user", content: prompt }],
+    }),
+  });
+  if (!res.ok) return "";
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || "";
+}
+
+async function getFullResponse(indonesianText: string, source: string, lang: string) {
   const targetLang = LANG_NAMES[lang] || "bahasa Indonesia";
+  const isId = lang === "id";
 
   try {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
-        max_tokens: 300,
-        temperature: 0.5,
-        messages: [{
-          role: "system",
-          content: `You are an Islamic scholar assistant. Always respond in ${targetLang}. Be concise and clear.`,
-        }, {
-          role: "user",
-          content: `Explain this hadith from ${source} in 2-3 sentences in ${targetLang}. Then give 1 short practical lesson for daily life.
+    // For non-Indonesian: translate hadith text + explain + lesson in one call
+    // For Indonesian: just explain + lesson
+    const systemPrompt = `You are an Islamic scholar assistant. Always respond ONLY in ${targetLang}. Be concise and accurate.`;
 
-Hadith: "${text}"
+    let userPrompt: string;
+    if (isId) {
+      userPrompt = `Jelaskan hadis berikut dari ${source} dalam 2-3 kalimat bahasa Indonesia yang mudah dipahami. Berikan 1 pelajaran praktis untuk kehidupan sehari-hari.
 
-Respond ONLY with valid JSON, no markdown:
-{"explanation":"...","lesson":"..."}`,
-        }],
-      }),
-    });
+Hadis: "${indonesianText}"
 
-    if (!res.ok) return { explanation: "", lesson: "" };
-    const data = await res.json();
-    const raw = data.choices?.[0]?.message?.content || "";
+Balas HANYA JSON valid, tanpa markdown:
+{"explanation":"...","lesson":"...","translation":""}`;
+    } else {
+      userPrompt = `For this hadith from ${source}, do TWO things in ${targetLang}:
+1. Translate the hadith text to ${targetLang}
+2. Explain it in 2-3 sentences
+3. Give 1 practical lesson for daily life
+
+Hadith (in Indonesian): "${indonesianText}"
+
+Reply ONLY with valid JSON, no markdown:
+{"translation":"[hadith translated to ${targetLang}]","explanation":"[2-3 sentence explanation in ${targetLang}]","lesson":"[1 practical lesson in ${targetLang}]"}`;
+    }
+
+    const raw = await groqCall(userPrompt, systemPrompt);
+    if (!raw) return { explanation: "", lesson: "", translation: "" };
     const clean = raw.replace(/```json|```/g, "").trim();
-    const parsed = JSON.parse(clean);
-    return { explanation: parsed.explanation || "", lesson: parsed.lesson || "" };
+    // Extract JSON even if there's extra text
+    const match = clean.match(/\{[\s\S]*\}/);
+    if (!match) return { explanation: "", lesson: "", translation: "" };
+    const parsed = JSON.parse(match[0]);
+    return {
+      explanation: parsed.explanation || "",
+      lesson: parsed.lesson || "",
+      translation: parsed.translation || "",
+    };
   } catch {
-    return { explanation: "", lesson: "" };
+    return { explanation: "", lesson: "", translation: "" };
   }
 }
 
@@ -96,8 +118,16 @@ export async function POST(req: NextRequest) {
 
   const results = await Promise.all(top.map(async (m) => {
     const source = BOOK_LABELS[m.book] || m.book;
-    const { explanation, lesson } = await getExplanation(m.text, source, lang);
-    return { arabic: m.arabic || "", indonesia: m.text, source, number: m.number, book: m.book, explanation, lesson };
+    const { explanation, lesson, translation } = await getFullResponse(m.text, source, lang);
+    return {
+      arabic: m.arabic || "",
+      indonesia: translation && lang !== "id" ? translation : m.text,
+      source,
+      number: m.number,
+      book: m.book,
+      explanation,
+      lesson,
+    };
   }));
 
   return NextResponse.json({ results });
