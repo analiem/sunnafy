@@ -60,7 +60,7 @@ export default function Home() {
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-lg">☽</span>
-            <span className="font-bold text-primary tracking-tight">Sunnahfy</span>
+            <span className="font-bold text-primary tracking-tight">Sunnafy</span>
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
@@ -76,7 +76,7 @@ export default function Home() {
             ✦ {t.tagline}
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-primary mb-3 tracking-tight">
-            Sunnah<span className="text-green">fy</span>
+            Sunna<span className="text-green">fy</span>
           </h1>
           <p className="text-secondary text-base max-w-sm mx-auto leading-relaxed">
             {t.subtitle}
@@ -146,7 +146,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="mt-16 pt-8 border-t border-default text-center">
-          <p className="text-xs font-semibold text-muted mb-1">Sunnahfy</p>
+          <p className="text-xs font-semibold text-muted mb-1">Sunnafy</p>
           <p className="text-xs text-muted">{t.footer}</p>
         </footer>
       </main>

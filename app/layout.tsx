@@ -9,9 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Sunnahfy – Sunnah in your pocket",
+  title: "Sunnafy – Sunnah in your pocket",
   description: "Temukan hadis Nabi Muhammad ﷺ berdasarkan tema atau kata kunci, lengkap dengan penjelasan AI dalam 11 bahasa",
-  keywords: ["hadis", "hadith", "sunnah", "islam", "sunnahfy"],
+  keywords: ["hadis", "hadith", "sunnah", "islam", "sunnafy"],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

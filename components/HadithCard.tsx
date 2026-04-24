@@ -22,7 +22,7 @@ export default function HadithCard({ hadith, index, lang }: Props) {
   const badge = BOOK_BADGE[hadith.book] || BOOK_BADGE.bukhari;
 
   const handleShare = async () => {
-    const text = `📖 ${hadith.source} No. ${hadith.number}\n\n"${hadith.indonesia}"\n\n💡 ${hadith.lesson || ""}\n\n— Sunnahfy`;
+    const text = `📖 ${hadith.source} No. ${hadith.number}\n\n"${hadith.indonesia}"\n\n💡 ${hadith.lesson || ""}\n\n— Sunnafy`;
     try {
       if (navigator.share) await navigator.share({ text });
       else { await navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000); }
