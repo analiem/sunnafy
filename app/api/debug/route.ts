@@ -31,7 +31,7 @@ export async function GET() {
         "Authorization": `Bearer ${groqKey}`,
       },
       body: JSON.stringify({
-        model: "llama3-8b-8192",
+        model: "llama-3.3-70b-versatile",
         max_tokens: 50,
         messages: [{ role: "user", content: "Balas hanya: OK" }],
       }),
